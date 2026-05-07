@@ -111,7 +111,9 @@ export class Pipes extends Component {
             this.game?.createPipe();
         }
 
-        if (!this.isPass && this.topPipe.position.x <= 0) {
+        const birdX = this.game?.bird?.node.position.x ?? 0;
+        const pipeRightEdgeX = this.topPipe.position.x + topW * 0.5;
+        if (!this.isPass && pipeRightEdgeX <= birdX) {
             this.isPass = true;
             this.game?.passPipe();
         }
