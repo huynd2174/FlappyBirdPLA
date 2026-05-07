@@ -1,4 +1,4 @@
-import { _decorator, Component, Label, Node, director, tween, Tween, UIOpacity, Vec3 } from 'cc';
+import { _decorator, Component, Label, Node, director, tween, Tween, UIOpacity, Vec3, find } from 'cc';
 import { GameCtrl } from './GameCtrl';
 const { ccclass, property } = _decorator;
 
@@ -53,6 +53,15 @@ export class Results extends Component {
     private _tryAgainBasePos: Vec3 | null = null;
 
     onLoad() {
+        if (!this.gameCtrl) {
+            this.gameCtrl =
+                find('GameCtrl')?.getComponent(GameCtrl) ??
+                find('Canvas/GameCtrl')?.getComponent(GameCtrl) ??
+                null;
+        }
+        if (!this.tryAgainButton) {
+            this.tryAgainButton = this.node.getChildByName('Try_Again');
+        }
         this.maxScore = Number(localStorage.getItem('flappy_high_score') ?? 0);
         this.updateScore(0);
         this.hideResults();
@@ -100,6 +109,8 @@ export class Results extends Component {
         }
         if (this.tryAgainButton) {
             this.tryAgainButton.active = true;
+            this.tryAgainButton.off(Node.EventType.TOUCH_END, this.onClickTryAgain, this);
+            this.tryAgainButton.on(Node.EventType.TOUCH_END, this.onClickTryAgain, this);
         }
         // Ẩn HUD score khi đã vào board game over.
         if (this.scoreLabel) {
@@ -126,6 +137,7 @@ export class Results extends Component {
             this.scoreBoard.active = false;
         }
         if (this.tryAgainButton) {
+            this.tryAgainButton.off(Node.EventType.TOUCH_END, this.onClickTryAgain, this);
             this.tryAgainButton.active = false;
         }
         this.resetAnimState();
@@ -209,6 +221,12 @@ export class Results extends Component {
         const sceneName = director.getScene()?.name;
         if (sceneName) {
             director.loadScene(sceneName);
+        }
+    }
+
+    onDestroy() {
+        if (this.tryAgainButton) {
+            this.tryAgainButton.off(Node.EventType.TOUCH_END, this.onClickTryAgain, this);
         }
     }
 }
