@@ -9,9 +9,6 @@ import {
     Contact2DType,
     Collider2D,
     IPhysics2DContact,
-    input,
-    Input,
-    EventTouch,
     tween,
     Tween,
     Vec3,
@@ -153,23 +150,25 @@ export class GameCtrl extends Component {
     }
 
     initListener() {
-        input.on(Input.EventType.TOUCH_START, this.onGlobalTouchStart, this);
-    }
-
-    private onGlobalTouchStart(_event: EventTouch) {
-        if (this.isOver === true) {
-            if (this.startUI?.active) {
-                this.resetWorld();
-                this.startGame();
+        this.node.on(Node.EventType.TOUCH_START, () => {
+            if (this.isOver === true) {
+                if (this.startUI?.active) {
+                    this.resetWorld();
+                    this.startGame();
+                    // Tap đầu tiên: bắt đầu game và flap ngay.
+                    this.bird?.fly();
+                    this.clip?.onAudioQueue(0);
+                } else {
+                    this.returnToStartScreen();
+                }
+                return;
             }
-            // Màn game over: chỉ cho restart bằng nút Try_Again.
-            return;
-        }
 
-        if (this.isOver === false && !this._isDying) {
-            this.bird?.fly();
-            this.clip?.onAudioQueue(0);
-        }
+            if (this.isOver === false && !this._isDying) {
+                this.bird?.fly();
+                this.clip?.onAudioQueue(0);
+            }
+        });
     }
 
     startGame() {
@@ -429,15 +428,12 @@ export class GameCtrl extends Component {
         tween(op)
             .to(tin, { opacity: alpha })
             .to(tout, { opacity: 0 })
-            .call(() => {
-                if (this.hitFlash) this.hitFlash.active = false;
-            })
             .start();
     }
 
     private resetHitFlash() {
         if (!this.hitFlash) return;
-        this.hitFlash.active = false;
+        this.hitFlash.active = true;
         const op = this.hitFlash.getComponent(UIOpacity) ?? this.hitFlash.addComponent(UIOpacity);
         Tween.stopAllByTarget(op);
         op.opacity = 0;
@@ -479,7 +475,7 @@ export class GameCtrl extends Component {
         this.resetHitFlash();
         this.unfreezePlay();
         this._restoreBirdSiblingIndex();
-        input.off(Input.EventType.TOUCH_START, this.onGlobalTouchStart, this);
+        this.node.off(Node.EventType.TOUCH_START);
         const collider = this.bird?.getComponent(Collider2D);
         if (collider) {
             collider.off(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);

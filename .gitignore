@@ -5,11 +5,15 @@
 library/
 temp/
 local/
-build/*
-!build/web-mobile/
-!build/web-mobile/**
+build/
 profiles/
 native
+
+# Generated web build bundle artifacts (not source assets)
+assets/internal/
+assets/main/
+assets/internal.meta
+assets/main.meta
 #//////////////////////////
 # NPM
 #//////////////////////////
