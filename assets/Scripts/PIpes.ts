@@ -1,4 +1,4 @@
-import { _decorator, CCFloat, Component, find, Node, screen, Size, UITransform, Vec3 } from 'cc';
+import { _decorator, CCFloat, Component, find, Node, Size, UITransform, Vec3, view } from 'cc';
 import { GameCtrl } from './GameCtrl';
 const { ccclass, property } = _decorator;
 
@@ -50,7 +50,7 @@ export class Pipes extends Component {
 
     public tempStartLocationUp: Vec3 = new Vec3(0, 0, 0);
     public tempStartLocationDown: Vec3 = new Vec3(0, 0, 0);
-    public scene: Size = screen.windowSize;
+    public scene: Size = view.getDesignResolutionSize();
 
     public pipeSpeed = 0;
     public tempSpeed = 0;
@@ -65,6 +65,7 @@ export class Pipes extends Component {
         if (!this.game) {
             this.game = find('GameCtrl')?.getComponent(GameCtrl) ?? null;
         }
+        this.scene = view.getDesignResolutionSize();
         this.pipeSpeed = this.game?.pipeSpeed ?? 0;
         this.initPos();
         this.isPass = false;
@@ -73,6 +74,7 @@ export class Pipes extends Component {
 
     initPos() {
         if (!this.topPipe || !this.bottomPipe) return;
+        this.scene = view.getDesignResolutionSize();
 
         const topW = this.topPipe.getComponent(UITransform)?.width ?? 0;
 

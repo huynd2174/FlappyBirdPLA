@@ -158,9 +158,8 @@ export class GameCtrl extends Component {
                     // Tap đầu tiên: bắt đầu game và flap ngay.
                     this.bird?.fly();
                     this.clip?.onAudioQueue(0);
-                } else {
-                    this.returnToStartScreen();
                 }
+                // Ở màn Game Over: KHÔNG restart bằng tap màn hình (chỉ nút Try_Again).
                 return;
             }
 
